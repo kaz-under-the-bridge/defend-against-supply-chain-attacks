@@ -16,6 +16,8 @@
 | [incidents.md](incidents.md) | インシデントカタログ - 2024年後半〜2026年3月の主要事件を時系列で整理 |
 | [attack-vectors.md](attack-vectors.md) | 攻撃ベクトル分類 - 攻撃手法の体系化と発生頻度・影響度マトリクス |
 | [defense-strategies.md](defense-strategies.md) | 防御戦略 - 個人トークン保護、GitHub Actions保護、依存関係管理等 |
+| [package-validation.md](package-validation.md) | パッケージ正当性検証 - Socket.dev, SBOM, lockfileレビュー, postinstall無効化 |
+| [socket-dev-setup.md](socket-dev-setup.md) | Socket.dev導入・設定ガイド - org全体での必須チェック化手順 |
 
 ## 主要な知見
 
