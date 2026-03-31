@@ -38,6 +38,29 @@
 
 ---
 
+### LiteLLM PyPI侵害 - TeamPCP Phase 09 (2026年3月24日)
+
+- **CVE**: N/A
+- **対象**: `litellm@1.82.7`, `litellm@1.82.8` (PyPI)
+- **攻撃ベクトル**: **Trivy侵害からのカスケード攻撃** (CI/CDパイプライン経由のPyPIトークン窃取)
+- **概要**: LiteLLMのCI/CDパイプラインが侵害済みのTrivy Actionを使用していたため、`PYPI_PUBLISH` トークンが攻撃者のサーバーに送信された。攻撃者は正規の公開権限を取得し、正規のCI/CDを迂回してPyPIに直接悪意あるバージョンを公開。Trivy・KICS・LiteLLMの攻撃すべてに同一のRSA公開鍵が使用されており、TeamPCPによる一連のキャンペーン(Phase 09)と帰属される。
+- **ペイロード (3段階)**:
+  1. **情報収集**: SSH秘密鍵、AWS/GCP/Azure認証情報、Kubernetesトークン、暗号通貨ウォレット、環境変数、CI/CD設定ファイル等を体系的に収集
+  2. **暗号化・持ち出し**: AES-256-CBC + 4096ビットRSA公開鍵でハイブリッド暗号化し、偽ドメイン `models.litellm.cloud` へPOST送信
+  3. **永続化・横展開**: `~/.config/sysmon/sysmon.py` にバックドア設置、systemdサービスで5分ごとにC2をポーリング。Kubernetesサービスアカウントトークンが存在する場合、クラスタ全ノードに特権Podをデプロイしバックドアをインストール (**CanisterWorm** - ICP(Internet Computer Protocol)をC2チャネルに使用)
+- **v1.82.8の特筆事項**: `litellm_init.pth` をsite-packagesに配置し、**Pythonインタプリタ起動時に自動実行**。`import litellm` すら不要で発動。pipのハッシュ検証はwheelのRECORDファイルに正しく宣言されていたため通過した。
+- **影響**: 公開から隔離まで**わずか46分間**で約47,000DL（v1.82.8: 32,464、v1.82.7: 14,532）。LiteLLMは約340万DL/日。PyPI上でlitellmに依存する2,337パッケージのうち88%(2,054)が侵害バージョンを許容するバージョン指定だった。DSPy, MLflow, OpenHands, CrewAI等の主要下流プロジェクトが数時間以内にセキュリティPRを発行。
+- **発見**: FutureSearch社のエンジニアがCursor MCPプラグインの推移的依存関係としてインストールされた際に、マルウェアのフォークボム的バグ（指数関数的プロセス生成）によりマシンがクラッシュし発覚。**マルウェア自体のバグが早期発見につながった**。
+- **教訓**:
+  - **Trivy → LiteLLM**: セキュリティスキャナの侵害が下流プロジェクトのCI/CDトークン窃取に連鎖する実例
+  - `.pth` ファイルによるPython起動時の自動実行は `import` 不要で検出困難
+  - **Trusted Publishing (OIDC)** への移行で長期トークンのリスクを排除すべき
+  - Kubernetesクラスタへの横展開能力を持つマルウェアが登場 — クラウドインフラ全体が攻撃範囲に
+  - ブロックチェーン(ICP)をC2に使用する手法はテイクダウンが困難
+- **参考**: [LiteLLM公式](https://docs.litellm.ai/blog/security-update-march-2026), [Snyk](https://snyk.io/articles/poisoned-security-scanner-backdooring-litellm/), [FutureSearch](https://futuresearch.ai/blog/litellm-pypi-supply-chain-attack/), [The Register](https://www.theregister.com/2026/03/24/trivy_compromise_litellm/)
+
+---
+
 ### GlassWorm Open VSXキャンペーン (2026年1月〜3月)
 
 - **対象**: 72以上のOpen VSX拡張機能

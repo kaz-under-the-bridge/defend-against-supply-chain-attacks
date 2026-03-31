@@ -129,6 +129,14 @@ Shai-Hulud
   → npmトークン窃取
     → 被害者の他パッケージに自動感染 (最大100パッケージ)
       → さらに次の被害者のトークンを窃取...
+
+TeamPCP キャンペーン (2026年2-3月) ← 最も深刻なカスケード事例
+  Phase 1: Trivy GitHub Actionの pull_request_target 悪用でPAT窃取
+    → Phase 2: Trivyタグポイズニング (v0.69.4-6) → Docker Hub/GHCR/ECRに配布
+      → Phase 3: Trivyを使うCI/CDパイプラインからPyPIトークン窃取
+        → Phase 9: LiteLLM PyPI侵害 (46分間で47,000 DL)
+          → .pthファイルでPython起動時に自動実行
+            → Kubernetes横展開 (CanisterWorm)
 ```
 
 ---
